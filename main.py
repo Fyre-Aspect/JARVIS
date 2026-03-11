@@ -11,6 +11,7 @@ import pyjokes
 import time
 import pyautogui
 import pywhatkit
+import queue
 from google import genai
 from PIL import Image
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -24,6 +25,9 @@ from Jarvis.features.gui import Ui_MainWindow
 from Jarvis.config import config
 
 obj = JarvisAssistant()
+
+# Thread-safe queue for typed commands
+typed_command_queue = queue.Queue()
 
 # ================================ MEMORY ===========================================================================================================
 
@@ -44,8 +48,16 @@ CALENDAR_STRS = ["what do i have", "do i have plans", "am i busy"]
 # =======================================================================================================================================================
 
 
+# Signal class to update GUI log from worker thread
+class LogSignal(QObject):
+    message = pyqtSignal(str)
+
+log_signal = LogSignal()
+
+
 def speak(text):
     print(f"[JARVIS]: {text}")
+    log_signal.message.emit(f"[JARVIS] {text}")
     obj.tts(text)
 
 
@@ -108,9 +120,16 @@ class MainThread(QThread):
         startup()
 
         while True:
-            command = obj.mic_input()
-            if not command:
-                continue
+            # Check for typed commands first
+            try:
+                command = typed_command_queue.get_nowait()
+                log_signal.message.emit(f"[YOU] {command}")
+                print(f"You typed: {command}")
+            except queue.Empty:
+                command = obj.mic_input()
+                if not command:
+                    continue
+                log_signal.message.emit(f"[YOU] {command}")
 
             if re.search('date', command):
                 date = obj.tell_me_date()
@@ -342,6 +361,25 @@ class Main(QMainWindow):
         self.ui.setupUi(self)
         self.ui.pushButton.clicked.connect(self.startTask)
         self.ui.pushButton_2.clicked.connect(self.close)
+
+        # Connect log signal to GUI update
+        log_signal.message.connect(self.appendLog)
+
+        # Connect command input
+        self.ui.sendButton.clicked.connect(self.sendTypedCommand)
+        self.ui.commandInput.returnPressed.connect(self.sendTypedCommand)
+
+    def appendLog(self, text):
+        self.ui.logBrowser.append(text)
+        self.ui.logBrowser.verticalScrollBar().setValue(
+            self.ui.logBrowser.verticalScrollBar().maximum()
+        )
+
+    def sendTypedCommand(self):
+        text = self.ui.commandInput.text().strip().lower()
+        if text:
+            self.ui.commandInput.clear()
+            typed_command_queue.put(text)
 
     def __del__(self):
         sys.stdout = sys.__stdout__

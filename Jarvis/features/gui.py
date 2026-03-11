@@ -56,6 +56,45 @@ class Ui_MainWindow(object):
         self.textBrowser_3.setStyleSheet("font: 11pt \"MS Shell Dlg 2\";\n"
 "background-color:transparent;\ncolor:white;")
         self.textBrowser_3.setObjectName("textBrowser_3")
+
+        # Log area
+        self.logBrowser = QtWidgets.QTextBrowser(self.centralwidget)
+        self.logBrowser.setGeometry(QtCore.QRect(20, 500, 500, 250))
+        self.logBrowser.setStyleSheet(
+            "font: 10pt \"Consolas\";\n"
+            "background-color: rgba(0, 0, 0, 180);\n"
+            "color: rgb(0, 255, 0);\n"
+            "border: 1px solid rgb(0, 170, 255);\n"
+            "border-radius: 5px;\n"
+            "padding: 5px;"
+        )
+        self.logBrowser.setObjectName("logBrowser")
+
+        # Command input box
+        self.commandInput = QtWidgets.QLineEdit(self.centralwidget)
+        self.commandInput.setGeometry(QtCore.QRect(20, 760, 400, 40))
+        self.commandInput.setStyleSheet(
+            "font: 12pt \"MS Shell Dlg 2\";\n"
+            "background-color: rgba(0, 0, 0, 180);\n"
+            "color: white;\n"
+            "border: 1px solid rgb(0, 170, 255);\n"
+            "border-radius: 5px;\n"
+            "padding: 5px;"
+        )
+        self.commandInput.setPlaceholderText("Type a command...")
+        self.commandInput.setObjectName("commandInput")
+
+        # Send button
+        self.sendButton = QtWidgets.QPushButton(self.centralwidget)
+        self.sendButton.setGeometry(QtCore.QRect(430, 760, 90, 40))
+        self.sendButton.setStyleSheet(
+            "background-color: rgb(0, 170, 255);\n"
+            "font: 75 14pt \"MS Shell Dlg 2\";\n"
+            "border-radius: 5px;"
+        )
+        self.sendButton.setText("Send")
+        self.sendButton.setObjectName("sendButton")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 26))
