@@ -11,7 +11,7 @@ import pyjokes
 import time
 import pyautogui
 import pywhatkit
-import wolframalpha
+from google import genai
 from PIL import Image
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QTimer, QTime, QDate, Qt
@@ -48,17 +48,20 @@ def speak(text):
     obj.tts(text)
 
 
-app_id = config.wolframalpha_id
+gemini_client = genai.Client(api_key=config.gemini_api_key)
 
 
 def computational_intelligence(question):
     try:
-        client = wolframalpha.Client(app_id)
-        answer = client.query(question)
-        answer = next(answer.results).text
+        response = gemini_client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=question
+        )
+        answer = response.text.strip()
         print(answer)
         return answer
-    except:
+    except Exception as e:
+        print(e)
         speak("Sorry sir I couldn't fetch your question's answer. Please try again ")
         return None
     

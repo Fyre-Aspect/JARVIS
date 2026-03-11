@@ -1,19 +1,22 @@
 import requests
-import json
-
+import xml.etree.ElementTree as ET
 
 
 def get_news():
-    url = 'http://newsapi.org/v2/top-headlines?sources=the-times-of-india&apiKey=ae5ccbe2006a4debbe6424d7e4b569ec'
-    news = requests.get(url).text
-    news_dict = json.loads(news)
-    articles = news_dict['articles']
+    """
+    Fetch top headlines from Google News RSS (free, no API key needed)
+    :return: list of dicts with 'title' key, or False on failure
+    """
     try:
-
-        return articles
-    except:
+        url = 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en'
+        response = requests.get(url, timeout=10)
+        root = ET.fromstring(response.content)
+        articles = []
+        for item in root.findall('.//item'):
+            title = item.find('title')
+            if title is not None and title.text:
+                articles.append({'title': title.text})
+        return articles if articles else False
+    except Exception as e:
+        print(e)
         return False
-
-
-def getNewsUrl():
-    return 'http://newsapi.org/v2/top-headlines?sources=the-times-of-india&apiKey=ae5ccbe2006a4debbe6424d7e4b569ec'

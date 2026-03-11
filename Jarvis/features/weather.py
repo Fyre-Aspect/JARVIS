@@ -1,42 +1,33 @@
 import requests
-from Jarvis.config import config
-
 
 
 def fetch_weather(city):
     """
-    City to weather
+    City to weather using wttr.in (free, no API key needed)
     :param city: City
-    :return: weather
+    :return: weather string
     """
-    api_key = config.weather_api_key
-    units_format = "&units=metric"
+    try:
+        url = f"https://wttr.in/{city}?format=j1"
+        response = requests.get(url, timeout=10)
+        data = response.json()
 
-    base_url = "http://api.openweathermap.org/data/2.5/weather?q="
-    complete_url = base_url + city + "&appid=" + api_key + units_format
+        current = data["current_condition"][0]
+        weather_description = current["weatherDesc"][0]["value"]
+        current_temperature = current["temp_C"]
+        current_humidity = current["humidity"]
+        current_pressure = current["pressure"]
+        wind_speed = current["windspeedKmph"]
 
-    response = requests.get(complete_url)
-
-    city_weather_data = response.json()
-
-    if city_weather_data["cod"] != "404":
-        main_data = city_weather_data["main"]
-        weather_description_data = city_weather_data["weather"][0]
-        weather_description = weather_description_data["description"]
-        current_temperature = main_data["temp"]
-        current_pressure = main_data["pressure"]
-        current_humidity = main_data["humidity"]
-        wind_data = city_weather_data["wind"]
-        wind_speed = wind_data["speed"]
-
-        final_response = f"""
-        The weather in {city} is currently {weather_description} 
-        with a temperature of {current_temperature} degree celcius, 
-        atmospheric pressure of {current_pressure} hectoPascals, 
-        humidity of {current_humidity} percent 
-        and wind speed reaching {wind_speed} kilometers per hour"""
-
+        final_response = (
+            f"The weather in {city} is currently {weather_description} "
+            f"with a temperature of {current_temperature} degree celsius, "
+            f"atmospheric pressure of {current_pressure} hectoPascals, "
+            f"humidity of {current_humidity} percent "
+            f"and wind speed reaching {wind_speed} kilometers per hour"
+        )
         return final_response
 
-    else:
-        return "Sorry Sir, I couldn't find the city in my database. Please try again"
+    except Exception as e:
+        print(e)
+        return "Sorry Sir, I couldn't fetch the weather. Please try again"

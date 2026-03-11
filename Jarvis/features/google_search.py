@@ -1,9 +1,7 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-import re, pyttsx3
-
+import webbrowser
+import re
+import urllib.parse
+import pyttsx3
 
 
 def speak(text):
@@ -16,18 +14,12 @@ def speak(text):
 
 
 def google_search(command):
-
     reg_ex = re.search('search google for (.*)', command)
-    search_for = command.split("for", 1)[1]
-    url = 'https://www.google.com/'
     if reg_ex:
-        subgoogle = reg_ex.group(1)
-        url = url + 'r/' + subgoogle
+        search_for = reg_ex.group(1)
+    else:
+        search_for = command.split("for", 1)[1]
     speak("Okay sir!")
-    speak(f"Searching for {subgoogle}")
-    service = Service('driver/chromedriver.exe')
-    driver = webdriver.Chrome(service=service)
-    driver.get('https://www.google.com')
-    search = driver.find_element(By.NAME, 'q')
-    search.send_keys(str(search_for))
-    search.send_keys(Keys.RETURN)
+    speak(f"Searching for {search_for}")
+    url = 'https://www.google.com/search?q=' + urllib.parse.quote(search_for)
+    webbrowser.open(url)
