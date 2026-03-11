@@ -1,5 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 import re, pyttsx3
 
 
@@ -23,9 +25,9 @@ def google_search(command):
         url = url + 'r/' + subgoogle
     speak("Okay sir!")
     speak(f"Searching for {subgoogle}")
-    driver = webdriver.Chrome(
-        executable_path='driver/chromedriver.exe')
+    service = Service('driver/chromedriver.exe')
+    driver = webdriver.Chrome(service=service)
     driver.get('https://www.google.com')
-    search = driver.find_element_by_name('q')
+    search = driver.find_element(By.NAME, 'q')
     search.send_keys(str(search_for))
     search.send_keys(Keys.RETURN)
