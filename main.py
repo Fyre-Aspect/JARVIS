@@ -45,6 +45,7 @@ CALENDAR_STRS = ["what do i have", "do i have plans", "am i busy"]
 
 
 def speak(text):
+    print(f"[JARVIS]: {text}")
     obj.tts(text)
 
 
@@ -67,14 +68,7 @@ def computational_intelligence(question):
     
 def startup():
     speak("Initializing Jarvis")
-    speak("Starting all systems applications")
-    speak("Installing and checking all drivers")
-    speak("Caliberating and examining all the core processors")
-    speak("Checking the internet connection")
-    speak("Wait a moment sir")
-    speak("All drivers are up and running")
-    speak("All systems have been activated")
-    speak("Now I am online")
+    speak("All systems are online")
     hour = int(datetime.datetime.now().hour)
     if hour>=0 and hour<=12:
         speak("Good Morning")
@@ -112,10 +106,11 @@ class MainThread(QThread):
 
     def TaskExecution(self):
         startup()
-        wish()
 
         while True:
             command = obj.mic_input()
+            if not command:
+                continue
 
             if re.search('date', command):
                 date = obj.tell_me_date()
